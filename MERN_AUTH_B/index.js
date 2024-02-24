@@ -1,13 +1,10 @@
 // Imports
-const express = require('express'),
-  sessions = require('express-session'),
-  bodyParser = require('body-parser');
-
+import express from 'express'
+import sessions  from 'express-session'
 // Server creation
 const app = express();
-
 // Top level middleware
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(sessions({
   secret: 'fdjlskaifoudoieruhwfdi9er80uio430942u94023er87iu89ef7d6t7uygehuijorr78fhjdeir90-8iuy3df9087eiruyhjkn4i0f9u',
   resave: false,
@@ -52,12 +49,12 @@ app.delete('/api/logout', (req, res) => {
 
 // User details endpoint
 app.get('/api/user_details', checkSession, (req, res) => {
-  res.status(200).send([]);
+  res.status(200).send({user_details:"user ki details"});
 });
 
 // User contacts endpoint
 app.get('/api/user_contacts', checkSession, (req, res) => {
-  res.status(200).send([]);
+  res.status(200).send({user_k_contacts:"user k contacts"});
 });
 
 // Server listen
