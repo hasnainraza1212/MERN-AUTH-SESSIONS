@@ -34,12 +34,11 @@ app.post('/api/login', (req, res) => {
 });
 
 app.get('/api/me', (req, res) => {
-  // if (req.session.username) {
-  //   res.status(200).send(req.session.username);
-  // } else {
-  //   res.sendStatus(403);
-  // }
-  res.status(200).send({user:"me"})
+  if (req.session.username) {
+    res.status(200).send(req.session.username);
+  } else {
+    res.status(403).send({message:"unauthorized"});
+  }
 });
 
 app.delete('/api/logout', (req, res) => {
