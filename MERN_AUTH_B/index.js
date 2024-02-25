@@ -12,7 +12,7 @@ const app = express();
 // Top level middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'https://mern-auth-session.netlify.app/',
+  origin: 'https://mern-auth-session.netlify.app',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: false,
   optionsSuccessStatus: 204,
