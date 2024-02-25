@@ -1,11 +1,11 @@
+import { useNavigate } from 'react-router-dom'
 import './App.css'
+import AppRouter from './AppRouter/AppRouter'
 
 function App() {
   return (
     <>
-     <h1>
-      hello from react js
-     </h1>
+    <AppRouter/>
     </>
   )
 }

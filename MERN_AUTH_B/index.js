@@ -1,60 +1,57 @@
 // Imports
 import express from 'express'
-import sessions  from 'express-session'
+import session  from 'express-session'
+import cors from "cors"
+import connectMongoDBClient from './db/db.js';
+import { login } from './controller/login.js';
+import { getUser } from './controller/getUser.js';
+import { access } from './controller/access.js';
 // Server creation
+connectMongoDBClient()
 const app = express();
 // Top level middleware
 app.use(express.json());
-app.use(sessions({
-  secret: 'fdjlskaifoudoieruhwfdi9er80uio430942u94023er87iu89ef7d6t7uygehuijorr78fhjdeir90-8iuy3df9087eiruyhjkn4i0f9u',
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+  credentials: true // Allow credentials (cookies) to be sent
+}));
+app.use(session({
+  secret: 'my-cat',
   resave: false,
   saveUninitialized: false,
   // Here is a pretty good answer about what resave and saveUninitialized do, if you're super curious https://stackoverflow.com/questions/40381401/when-use-saveuninitialized-and-resave-in-express-session
   cookie: {
-    maxAge: 600000000
+    domain: 'localhost',
+    maxAge: 600000000,
+    secure:false
   }
 }));
 
-// Middleware to check if session exists
+// // Middleware to check if session exists
 const checkSession = (req, res, next) => {
-  if (req.session.username) {
+  if (req.session._id) {
     next(); // Session exists, proceed to next middleware or route handler
   } else {
-    res.redirect('/login'); // Redirect to login if session doesn't exist
+    res.status(403).send({message:"Unauthorized", success:false});  // Redirect to login if session doesn't exist
   }
 };
 
-// Endpoints
-app.post('/api/login', (req, res) => {
-  // Here is where you would query the database
-  // Once you get the user out of the database, you would set their id on sessions instead of the username example we are using below
-  req.session.username = req.body.username;
-  console.log(req.session);
-  res.sendStatus(200);
-});
+app.get("/api/access", access)
+// // Endpoints
+app.post('/api/login', login);
 
-app.get('/api/me', (req, res) => {
-  if (req.session.username) {
-    res.status(200).send(req.session.username);
-  } else {
-    res.status(403).send({message:"unauthorized"});
-  }
-});
+app.get('/api/me',checkSession,getUser);
 
-app.delete('/api/logout', (req, res) => {
+app.post('/api/logout', (req, res) => {
   // This method destroys a session
+  if(!req.session._id){
+    return res.status(404).send({success:false, message:"session not found logout error"})
+  }
   req.session.destroy();
-  res.sendStatus(200);
-});
-
-// User details endpoint
-app.get('/api/user_details', checkSession, (req, res) => {
-  res.status(200).send({user_details:"user ki details"});
-});
-
-// User contacts endpoint
-app.get('/api/user_contacts', checkSession, (req, res) => {
-  res.status(200).send({user_k_contacts:"user k contacts"});
+ return res.status(200).send({message:"user logout", success:true});
 });
 
 // Server listen
